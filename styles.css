@@ -1,0 +1,248 @@
+:root {
+  --navy-950: #061923;
+  --navy-900: #0a2638;
+  --navy-800: #0d3650;
+  --navy-700: #174f70;
+  --blue-500: #2384b8;
+  --green: #2fd18c;
+  --white: #ffffff;
+  --muted: #a9bfcc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--navy-950);
+}
+
+body {
+  padding: 6px;
+}
+
+.shell {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 58px 24px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: var(--navy-900);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.32);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 6px 14px;
+  color: var(--white);
+  background:
+    linear-gradient(90deg, rgba(18, 67, 97, 0.98), rgba(7, 34, 49, 0.98));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.25));
+}
+
+.brand-text {
+  min-width: 0;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: clamp(17px, 1.45vw, 24px);
+  line-height: 1.05;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+
+.brand-text p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: clamp(9px, 0.72vw, 12px);
+  white-space: nowrap;
+}
+
+.status-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 0 0 auto;
+}
+
+.connection {
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid rgba(47, 209, 140, 0.40);
+  border-radius: 999px;
+  color: #dfffee;
+  background: rgba(47, 209, 140, 0.09);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.11em;
+}
+
+.connection.offline {
+  border-color: rgba(255, 181, 71, 0.5);
+  background: rgba(255, 181, 71, 0.12);
+  color: #fff2d6;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(47, 209, 140, 0.13);
+  animation: pulse 2s infinite;
+}
+
+.connection.offline .dot {
+  background: #ffb547;
+  box-shadow: 0 0 0 4px rgba(255, 181, 71, 0.13);
+}
+
+.clock {
+  min-width: 136px;
+  text-align: right;
+}
+
+.clock strong {
+  display: block;
+  font-size: clamp(18px, 1.5vw, 25px);
+  line-height: 1;
+  letter-spacing: 0.03em;
+}
+
+.clock span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 11px;
+  color: #edf7fb;
+  background: linear-gradient(90deg, #1d5d86, #174b6c);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.subbar span:last-child {
+  color: #d8e8f1;
+  font-weight: 600;
+}
+
+.viewer {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  background: #f6f8f9;
+}
+
+#dashboard {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #f6f8f9;
+}
+
+.progress {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  opacity: 0;
+  background: linear-gradient(90deg, #55c5ec, #2fd18c);
+}
+
+body.loading .progress {
+  opacity: 1;
+  animation: loadbar 1.8s ease-in-out infinite;
+}
+
+.loading-badge,
+.offline-badge {
+  position: absolute;
+  z-index: 6;
+  padding: 8px 11px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.loading-badge {
+  right: 12px;
+  bottom: 10px;
+  color: #fff;
+  background: rgba(5, 28, 42, 0.92);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: 0.2s ease;
+}
+
+body.loading .loading-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.offline-badge {
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  color: #fff6df;
+  background: rgba(145, 84, 0, 0.95);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes loadbar {
+  0%   { width: 8%; transform: translateX(-100%); }
+  55%  { width: 46%; }
+  100% { width: 75%; transform: translateX(145%); }
+}
+
+@media (max-width: 900px) {
+  body { padding: 0; }
+  .shell { border-radius: 0; border: 0; }
+  .brand-text p { display: none; }
+  .connection { display: none; }
+  .clock { min-width: 105px; }
+  .subbar { font-size: 10px; }
+}
