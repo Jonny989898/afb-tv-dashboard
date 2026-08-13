@@ -2,58 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b3048">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#050b10">
   <title>AFB Outside Staff Dashboard</title>
-  <link rel="icon" href="afb-logo.svg" type="image/svg+xml">
+  <link rel="icon" href="afb-logo.png" type="image/png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="shell">
+  <div class="app-shell">
     <header class="topbar">
-      <div class="brand">
-        <img src="afb-logo.svg" alt="AFB" class="logo">
-        <div class="brand-text">
+      <div class="brand-lockup">
+        <img src="afb-logo.png" class="afb-logo" alt="Ashlin Farm Barns">
+        <div>
           <h1>Outside Staff Dashboard</h1>
-          <p>Daily operations, hot tubs, maintenance and availability</p>
+          <p>Daily operations <b>•</b> hot tubs <b>•</b> maintenance <b>•</b> changeovers</p>
         </div>
       </div>
-
-      <div class="status-area">
-        <div class="connection" id="connectionState">
-          <span class="dot"></span>
-          <span>LIVE</span>
-        </div>
-
-        <div class="clock">
-          <strong id="clock">--:--:--</strong>
-          <span id="date">Loading…</span>
-        </div>
+      <div class="header-stats">
+        <div class="system-state" id="systemState"><span class="live-dot"></span><strong>LIVE</strong><small>All systems operational</small></div>
+        <div class="clock-block"><strong id="clock">--:--:--</strong><small id="date">Loading date…</small></div>
+        <div class="weather-block"><span id="weatherIcon">◐</span><strong id="weatherTemp">Lincoln</strong><small id="weatherText">Weather loading…</small></div>
+        <div class="refresh-block"><span>Next refresh</span><strong id="refreshCountdown">05:00</strong><small>5 min auto refresh</small></div>
       </div>
     </header>
 
-    <div class="subbar">
-      <span>Ashlin Farm Barns — Operations Dashboard</span>
-      <span id="refreshText">Loading dashboard…</span>
-    </div>
+    <nav class="screen-tabs" aria-label="Dashboard screens">
+      <button class="screen-tab active" data-screen="overview">Screen 1 <span>Operations overview</span></button>
+      <button class="screen-tab" data-screen="availability">Screen 2 <span>Hot tubs & availability</span></button>
+      <div class="data-status"><span id="dataStatus">Connecting to live sheet…</span><i id="lastUpdated"></i></div>
+    </nav>
 
-    <main class="viewer">
-      <div class="progress" id="progress"></div>
+    <main>
+      <section class="screen active" id="overviewScreen">
+        <div class="alert-row">
+          <article class="alert-card priority"><span class="card-icon">!</span><div><small>Next priority</small><strong id="priorityBarn">Loading…</strong><span id="priorityTask">Checking maintenance</span></div></article>
+          <article class="alert-card cleaning"><span class="card-icon">⌁</span><div><small>Cleaning</small><strong><b id="cleaningCount">–</b> barns</strong><span id="cleaningText">Checking status</span></div></article>
+          <article class="alert-card tubs"><span class="card-icon">♨</span><div><small>Hot tubs</small><strong id="hotTubReady">– / 24 ready</strong><span id="hotTubText">Checking temperatures</span></div></article>
+          <article class="alert-card maintenance"><span class="card-icon">◆</span><div><small>Maintenance</small><strong><b id="maintenanceJobs">–</b> jobs</strong><span id="maintenanceText">Checking due items</span></div></article>
+          <article class="alert-card chargers"><span class="card-icon">ϟ</span><div><small>EV chargers</small><strong><b id="chargerOffline">–</b> offline</strong><span id="chargerText">Status check required</span></div></article>
+        </div>
 
-      <iframe
-        id="dashboard"
-        title="AFB Operations Dashboard"
-        referrerpolicy="no-referrer"
-        allowfullscreen>
-      </iframe>
+        <div class="overview-grid">
+          <article class="panel tubs-panel">
+            <header><h2>Hot tub status & care</h2><span id="tubPanelBadge">Live status</span></header>
+            <div class="table-wrap"><table id="hotTubTable"><thead><tr><th>Barn</th><th>Temp</th><th>Set</th><th>Status</th><th>Pump</th><th>Refill</th><th>Last service</th></tr></thead><tbody></tbody></table></div>
+            <footer id="tubFooter">Loading hot tub information…</footer>
+          </article>
 
-      <div id="loadingBadge" class="loading-badge">Refreshing latest information…</div>
-      <div id="offlineBadge" class="offline-badge" hidden>
-        Internet connection lost — showing the last loaded dashboard
-      </div>
+          <article class="panel actions-panel">
+            <header><h2>Today’s actions</h2><span id="todayLabel">Today</span></header>
+            <div class="metric-grid">
+              <div><small>Check-ins</small><strong id="checkIns">–</strong></div>
+              <div><small>Check-outs</small><strong id="checkOuts">–</strong></div>
+              <div><small>Changeovers</small><strong id="changeovers">–</strong></div>
+              <div class="warn"><small>Early check-ins</small><strong id="earlyCheckIns">–</strong></div>
+              <div><small>Late check-outs</small><strong id="lateCheckOuts">–</strong></div>
+              <div><small>TT setups</small><strong id="ttSetups">–</strong></div>
+            </div>
+            <div class="action-ribbons">
+              <div class="danger" id="cleaningRibbon">Cleaning status loading</div>
+              <div class="amber" id="tubActionRibbon">Hot tub status loading</div>
+              <div class="blue" id="changeRibbon">Today’s actions loading</div>
+            </div>
+          </article>
+
+          <article class="panel maintenance-panel">
+            <header><h2>Maintenance</h2><span>Due items</span></header>
+            <div class="priority-box"><small>Next priority</small><strong id="maintenanceBarn">Loading…</strong><span id="maintenanceTask">Checking task list</span><b id="maintenanceAge"></b></div>
+            <dl class="summary-list">
+              <div><dt>Total items</dt><dd id="maintenanceTotal">–</dd></div>
+              <div class="bad"><dt>Overdue</dt><dd id="maintenanceOverdue">–</dd></div>
+              <div class="warn"><dt>Due this month</dt><dd id="maintenanceThisMonth">–</dd></div>
+              <div class="good"><dt>Due next month</dt><dd id="maintenanceNextMonth">–</dd></div>
+              <div><dt>Due soon</dt><dd id="maintenanceSoon">–</dd></div>
+            </dl>
+          </article>
+
+          <div class="side-stack">
+            <article class="panel mini-panel"><header><h2>PAT testing</h2></header><dl class="summary-list compact"><div><dt>Total items</dt><dd id="patTotal">–</dd></div><div><dt>Failed</dt><dd id="patFailed">–</dd></div><div class="bad"><dt>Overdue</dt><dd id="patOverdue">–</dd></div><div><dt>Due soon</dt><dd id="patSoon">–</dd></div></dl></article>
+            <article class="panel next-panel"><header><h2>Next actions</h2><span>Top 5</span></header><div id="nextActions" class="next-actions"><p>Loading task list…</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="availabilityScreen">
+        <div class="availability-header">
+          <div><small>Screen 2</small><h2>Hot tubs & availability</h2><p>Live booking window from 3 days ago to 14 days ahead</p></div>
+          <div class="legend"><span class="booked">Booked</span><span class="turn">Changeover</span><span class="free">Available</span><span class="fault">Action needed</span></div>
+        </div>
+        <div class="availability-layout">
+          <article class="panel availability-panel"><div class="availability-scroll"><table id="availabilityTable"><thead></thead><tbody></tbody></table></div></article>
+          <aside class="availability-side">
+            <article class="panel"><header><h2>Hot tub actions</h2></header><div id="tubActionList" class="large-actions"><p>Loading live hot tub status…</p></div></article>
+            <article class="panel occupancy"><small>Site occupancy</small><strong id="occupancyCount">– / 24</strong><span id="occupancyText">Loading bookings…</span></article>
+          </aside>
+        </div>
+      </section>
     </main>
-  </div>
 
+    <footer class="footerbar">
+      <span><i class="status-orb green"></i>Internet <b id="internetState">Connected</b></span>
+      <span><i class="status-orb green"></i>Data source <b id="sourceState">Connecting</b></span>
+      <span>Dashboard refreshes every 5 minutes</span>
+      <em>Exceptional stays. Personal touches.</em>
+      <img src="afb-logo.png" alt="">
+    </footer>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
