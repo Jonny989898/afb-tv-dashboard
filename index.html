@@ -28,7 +28,7 @@
 
     <nav class="screen-tabs" aria-label="Dashboard screens">
       <button class="screen-tab active" data-screen="overview">Screen 1 <span>Operations overview</span></button>
-      <button class="screen-tab" data-screen="availability">Screen 2 <span>Hot tubs & availability</span></button>
+      <button class="screen-tab" data-screen="availability">Screen 2 <span>Bookings & changeovers</span></button>
       <button class="screen-tab" data-screen="operations">Screen 3 <span>Live site operations</span></button>
       <div class="data-status"><span id="dataStatus">Connecting to live sheet…</span><i id="lastUpdated"></i></div>
     </nav>
@@ -40,7 +40,6 @@
           <article class="alert-card cleaning"><span class="card-icon">⌁</span><div><small>Cleaning</small><strong><b id="cleaningCount">–</b> barns</strong><span id="cleaningText">Checking status</span></div></article>
           <article class="alert-card tubs"><span class="card-icon">♨</span><div><small>Hot tubs</small><strong id="hotTubReady">– / 24 ready</strong><span id="hotTubText">Checking temperatures</span></div></article>
           <article class="alert-card maintenance"><span class="card-icon">◆</span><div><small>Maintenance</small><strong><b id="maintenanceJobs">–</b> jobs</strong><span id="maintenanceText">Checking due items</span></div></article>
-          <article class="alert-card chargers"><span class="card-icon">ϟ</span><div><small>EV chargers</small><strong><b id="chargerOffline">–</b> offline</strong><span id="chargerText">Status check required</span></div></article>
         </div>
 
         <div class="overview-grid">
@@ -88,15 +87,11 @@
 
       <section class="screen" id="availabilityScreen">
         <div class="availability-header">
-          <div><small>Screen 2</small><h2>Hot tubs & availability</h2><p>Live booking window from 3 days ago to 14 days ahead</p></div>
-          <div class="legend"><span class="booked">Booked</span><span class="turn">Changeover</span><span class="free">Available</span><span class="fault">Action needed</span></div>
+          <div><small>Screen 2</small><h2>Bookings & changeovers</h2><p>Live calendar from 3 days ago to 14 days ahead</p></div>
+          <div class="legend"><span class="booked">Booked</span><span class="turn">Changeover</span><span class="checkout">Check-out</span><span class="checkin">Check-in</span><span class="maintenance-key">Maintenance</span></div>
         </div>
         <div class="availability-layout">
           <article class="panel availability-panel"><div class="availability-scroll"><table id="availabilityTable"><thead></thead><tbody></tbody></table></div></article>
-          <aside class="availability-side">
-            <article class="panel"><header><h2>Hot tub actions</h2></header><div id="tubActionList" class="large-actions"><p>Loading live hot tub status…</p></div></article>
-            <article class="panel occupancy"><small>Site occupancy</small><strong id="occupancyCount">– / 24</strong><span id="occupancyText">Loading bookings…</span></article>
-          </aside>
         </div>
       </section>
 
