@@ -26,6 +26,6 @@ Upload all five files to the repository root:
 
 The GitHub Pages test address remains:
 
-`https://m9zwhjg7m4-art.github.io/afb-tv-dashboard/`
+`https://Jonny989898.github.io/afb-tv-dashboard/`
 
 The Raspberry Pi should remain unchanged until this version has been tested.
