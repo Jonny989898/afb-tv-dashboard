@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b3048">
+  <title>AFB Outside Staff Dashboard</title>
+  <link rel="icon" href="afb-logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="afb-logo.svg" alt="AFB" class="logo">
+        <div class="brand-text">
+          <h1>Outside Staff Dashboard</h1>
+          <p>Daily operations, hot tubs, maintenance and availability</p>
+        </div>
+      </div>
+
+      <div class="status-area">
+        <div class="connection" id="connectionState">
+          <span class="dot"></span>
+          <span>LIVE</span>
+        </div>
+
+        <div class="clock">
+          <strong id="clock">--:--:--</strong>
+          <span id="date">Loading…</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="subbar">
+      <span>Ashlin Farm Barns — Operations Dashboard</span>
+      <span id="refreshText">Loading dashboard…</span>
+    </div>
+
+    <main class="viewer">
+      <div class="progress" id="progress"></div>
+
+      <iframe
+        id="dashboard"
+        title="AFB Operations Dashboard"
+        referrerpolicy="no-referrer"
+        allowfullscreen>
+      </iframe>
+
+      <div id="loadingBadge" class="loading-badge">Refreshing latest information…</div>
+      <div id="offlineBadge" class="offline-badge" hidden>
+        Internet connection lost — showing the last loaded dashboard
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
