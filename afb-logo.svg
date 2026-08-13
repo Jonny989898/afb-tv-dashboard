@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img">
+  <defs>
+    <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#65c9ed"/>
+      <stop offset="1" stop-color="#1f7dac"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="116" height="116" rx="24" fill="#fff"/>
+  <path d="M17 55 60 20l43 35v42H17z" fill="url(#roof)"/>
+  <path d="M33 55 60 33l27 22v42H33z" fill="#0f3550"/>
+  <rect x="48" y="63" width="24" height="34" rx="3" fill="#fff"/>
+  <path d="M17 97h86" stroke="#69b85a" stroke-width="8" stroke-linecap="round"/>
+  <text x="60" y="114" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#0f3550">AFB</text>
+</svg>
