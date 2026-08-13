@@ -29,6 +29,7 @@
     <nav class="screen-tabs" aria-label="Dashboard screens">
       <button class="screen-tab active" data-screen="overview">Screen 1 <span>Operations overview</span></button>
       <button class="screen-tab" data-screen="availability">Screen 2 <span>Hot tubs & availability</span></button>
+      <button class="screen-tab" data-screen="operations">Screen 3 <span>Live site operations</span></button>
       <div class="data-status"><span id="dataStatus">Connecting to live sheet…</span><i id="lastUpdated"></i></div>
     </nav>
 
@@ -96,6 +97,32 @@
             <article class="panel"><header><h2>Hot tub actions</h2></header><div id="tubActionList" class="large-actions"><p>Loading live hot tub status…</p></div></article>
             <article class="panel occupancy"><small>Site occupancy</small><strong id="occupancyCount">– / 24</strong><span id="occupancyText">Loading bookings…</span></article>
           </aside>
+        </div>
+      </section>
+
+      <section class="screen" id="operationsScreen">
+        <div class="operations-header">
+          <div><small>Screen 3</small><h2>Live site operations</h2><p>Securely linked to AFB Staff</p></div>
+          <div class="operations-updated"><span id="appFeedState">Checking secure connection…</span><i id="appFeedUpdated"></i></div>
+        </div>
+        <div id="tvSetupState" class="tv-setup-state" hidden>
+          <strong>Connect this TV to AFB Staff</strong>
+          <p>Create a one-time setup link in <b>Manager → TV dashboard</b>, then open that link on this screen.</p>
+        </div>
+        <div id="operationsContent" class="operations-content">
+          <div class="operations-metrics">
+            <article class="ops-metric staff"><span>Outside staff</span><strong id="staffCount">–</strong><small>checked in now</small></article>
+            <article class="ops-metric bbq"><span>BBQs</span><strong id="bbqCount">–</strong><small>to clean</small></article>
+            <article class="ops-metric lockout"><span>Hot tubs</span><strong id="lockoutCount">–</strong><small>on lockout</small></article>
+            <article class="ops-metric urgent"><span>Maintenance</span><strong id="urgentCount">–</strong><small>urgent / high</small></article>
+            <article class="ops-metric checks"><span>Checks today</span><strong><b id="morningCheckCount">–</b> / <b id="afternoonCheckCount">–</b></strong><small>morning / afternoon</small></article>
+          </div>
+          <div class="operations-grid">
+            <article class="panel ops-panel"><header><h2>Outside staff checked in</h2><span>First names</span></header><div id="checkedInList" class="ops-list"></div></article>
+            <article class="panel ops-panel"><header><h2>BBQs to clean</h2><span>Thursday & Sunday reports</span></header><div id="bbqList" class="ops-list"></div></article>
+            <article class="panel ops-panel"><header><h2>Hot tub lockouts</h2><span>Current</span></header><div id="lockoutList" class="ops-list"></div></article>
+            <article class="panel ops-panel maintenance-live"><header><h2>Urgent app maintenance</h2><span>Top 5</span></header><div id="urgentList" class="ops-list"></div></article>
+          </div>
         </div>
       </section>
     </main>
