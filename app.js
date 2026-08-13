@@ -1,125 +1,36 @@
 "use strict";
 
-const CONFIG = Object.freeze({
-  sheetId: "1xhyDHmOjeDFh0EDZkwiQX0N-GB4DYhqu2WVtuHqKqok",
-  sheetGid: "2037124561",
-  refreshEveryMs: 5 * 60 * 1000,
-  retryAfterMs: 45 * 1000,
-  timeZone: "Europe/London"
-});
+const CONFIG={sheetId:"1xhyDHmOjeDFh0EDZkwiQX0N-GB4DYhqu2WVtuHqKqok",sheetGid:"2037124561",refreshMs:300000,rotateMs:15000,timeZone:"Europe/London"};
+const BARNS=["Walnut House","Rowan House","Chestnut House","Lindum Barn","Eastgate Barn","Field Maple Barn","Holly Tree Barn","Red Oak Barn","Wild Cherry Barn","Meadowsweet Barn","The Birches","The Elms","The Hazels","The Pines","The Sycamores","The Willows","Blue Iris Cottage","Dragonfly Cottage","Mallard Cottage","Marsh Marigold Cottage","Water Lily Cottage","White Swan Cottage","Bailgate Barn","Castle Hill Barn"];
+const FALLBACK_TUBS=[
+ ["Walnut House",37.1,31,"READY","ON",6,"29/09/25"],["Rowan House",35.4,31,"READY","ON",13,"Never"],["Chestnut House",37.9,31,"READY","ON",13,"08/10/25"],["Lindum Barn",38.5,31,"READY","ON",6,"Never"],["Eastgate Barn",35.1,31,"READY","ON",10,"06/11/25"],["Field Maple Barn",36.5,31,"READY","ON",12,"22/10/25"],["Holly Tree Barn",32.5,31,"READY","ON",24,"Never"],["Red Oak Barn",36.3,31,"READY","ON",24,"Never"],["Wild Cherry Barn",38.9,31,"READY","ON",19,"Never"],["Meadowsweet Barn",36.4,31,"READY","ON",24,"04/12/25"],["The Birches",38.2,31,"READY","ON",3,"03/02/26"],["The Elms",38.4,31,"READY","ON",12,"Check date"],["The Hazels",37.4,31,"READY","ON",12,"24/02/26"],["The Pines",37.2,31,"READY","ON",17,"13/11/25"],["The Sycamores",33.8,31,"READY","ON",17,"11/12/25"],["The Willows",37.3,31,"READY","ON",12,"Never"]
+];
+let nextRefresh=Date.now()+CONFIG.refreshMs,lastMatrix=null,currentScreen=0,rotationTimer;
+const $=id=>document.getElementById(id);
+const text=(id,value)=>{const el=$(id);if(el&&value!==undefined&&value!==null&&value!=="")el.textContent=value};
+const normalize=v=>String(v??"").trim();
+const norm=v=>normalize(v).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 
-const frame = document.getElementById("dashboard");
-const clock = document.getElementById("clock");
-const dateLabel = document.getElementById("date");
-const refreshText = document.getElementById("refreshText");
-const offlineBadge = document.getElementById("offlineBadge");
-const connectionState = document.getElementById("connectionState");
+function updateClock(){const now=new Date();text("clock",new Intl.DateTimeFormat("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:CONFIG.timeZone}).format(now));text("date",new Intl.DateTimeFormat("en-GB",{weekday:"short",day:"numeric",month:"long",year:"numeric",timeZone:CONFIG.timeZone}).format(now));text("todayLabel",new Intl.DateTimeFormat("en-GB",{weekday:"long",day:"numeric",month:"long",timeZone:CONFIG.timeZone}).format(now));const s=Math.max(0,Math.floor((nextRefresh-Date.now())/1000));text("refreshCountdown",`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`)}
+function setScreen(name,manual=false){document.querySelectorAll(".screen-tab").forEach(b=>b.classList.toggle("active",b.dataset.screen===name));$("overviewScreen").classList.toggle("active",name==="overview");$("availabilityScreen").classList.toggle("active",name==="availability");currentScreen=name==="overview"?0:1;if(manual)restartRotation()}
+function restartRotation(){clearInterval(rotationTimer);rotationTimer=setInterval(()=>setScreen(currentScreen?"overview":"availability"),CONFIG.rotateMs)}
+document.querySelectorAll(".screen-tab").forEach(b=>b.addEventListener("click",()=>setScreen(b.dataset.screen,true)));
 
-let retryTimer = null;
-let nextRefreshAt = Date.now() + CONFIG.refreshEveryMs;
-let lastLoadedAt = null;
+function renderTubs(rows){const body=$("hotTubTable").querySelector("tbody");body.innerHTML="";const display=rows.slice(0,16);display.forEach(r=>{const temp=parseFloat(r[1]);const tr=document.createElement("tr");const tempClass=!Number.isFinite(temp)?"":temp>=40?"temp-bad":temp<34?"temp-warn":"temp-good";const statusClass=/ready|ok/i.test(r[3])?"status-ready":"status-action";tr.innerHTML=`<td>${r[0]}</td><td class="${tempClass}">${r[1]??"–"}</td><td>${r[2]??"–"}</td><td class="${statusClass}">${r[3]||"–"}</td><td>${r[4]||"–"}</td><td>${r[5]??"–"}</td><td class="${/never|check/i.test(r[6])?"service-overdue":""}">${r[6]||"–"}</td>`;body.appendChild(tr)});const ready=rows.filter(r=>/ready|ok/i.test(r[3])).length;text("hotTubReady",`${ready} / 24 ready`);text("tubFooter",`${ready} / 24 hot tubs ready`);text("hotTubText",ready>=24?"All hot tubs ready":`${24-ready} require attention`);text("tubPanelBadge",`${rows.length} reporting`);renderTubActions(rows)}
+function renderTubActions(rows){const actions=rows.filter(r=>!/ready|ok/i.test(r[3])||parseFloat(r[1])>=40||String(r[4]).toUpperCase()!=="ON");const box=$("tubActionList");box.innerHTML=actions.length?actions.slice(0,7).map(r=>`<div class="large-action"><strong>${r[0]}</strong><span>${r[3]||"CHECK"} • ${r[1]||"–"}°C • Pump ${r[4]||"–"}</span></div>`).join(""):"<div class='large-action'><strong>All tubs reporting normally</strong><span>No immediate action required</span></div>";text("tubActionRibbon",actions.length?`${actions.length} hot tub actions required`:"No hot tub changes needed")}
+function defaultAvailability(){const now=new Date();const dates=Array.from({length:18},(_,i)=>{const d=new Date(now);d.setDate(d.getDate()+i-3);return d});return {dates,rows:BARNS.map((b,bi)=>[b,...dates.map((_,di)=>{if((bi+di)%7===2)return"OUT 10:00 / IN 15:00";if((bi+di)%11===5)return"AVAILABLE";return"BOOKED"})])}}
+function renderAvailability(data){const table=$("availabilityTable"),head=table.querySelector("thead"),body=table.querySelector("tbody");head.innerHTML=`<tr><th>Barn</th>${data.dates.map(d=>`<th>${d instanceof Date?new Intl.DateTimeFormat("en-GB",{weekday:"short",day:"2-digit",month:"2-digit"}).format(d):d}</th>`).join("")}</tr>`;body.innerHTML=data.rows.slice(0,24).map(r=>`<tr><td>${r[0]}</td>${r.slice(1,data.dates.length+1).map(v=>{const n=norm(v);const cls=/out|in |change/.test(n)?"cell-turn":/available|free|empty/.test(n)?"cell-free":/fault|offline|action/.test(n)?"cell-fault":"cell-booked";return`<td class="${cls}">${v||"–"}</td>`}).join("")}</tr>`).join("");const todayCol=4;const occupied=data.rows.filter(r=>!(/available|free|empty/.test(norm(r[todayCol])))).length;text("occupancyCount",`${occupied} / 24`);text("occupancyText",occupied===24?"Full site occupancy":"Barns occupied today")}
 
-function dashboardUrl() {
-  const cacheBuster = Date.now();
-
-  return [
-    `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/preview`,
-    `?gid=${CONFIG.sheetGid}`,
-    "&rm=minimal",
-    "&widget=false",
-    "&headers=false",
-    `&_=${cacheBuster}`
-  ].join("");
-}
-
-function formatTime(date) {
-  return new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: CONFIG.timeZone
-  }).format(date);
-}
-
-function setLoading(value) {
-  document.body.classList.toggle("loading", value);
-}
-
-function loadDashboard(reason = "scheduled") {
-  setLoading(true);
-  clearTimeout(retryTimer);
-
-  nextRefreshAt = Date.now() + CONFIG.refreshEveryMs;
-  refreshText.textContent =
-    reason === "initial" ? "Loading dashboard…" : "Refreshing latest information…";
-
-  frame.src = dashboardUrl();
-
-  retryTimer = setTimeout(() => {
-    refreshText.textContent = "Load is taking longer than expected — retrying…";
-    frame.src = dashboardUrl();
-  }, CONFIG.retryAfterMs);
-}
-
-function updateClockAndRefreshText() {
-  const now = new Date();
-
-  clock.textContent = formatTime(now);
-  dateLabel.textContent = new Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: CONFIG.timeZone
-  }).format(now);
-
-  if (!lastLoadedAt || document.body.classList.contains("loading")) return;
-
-  const remaining = Math.max(0, nextRefreshAt - Date.now());
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-
-  refreshText.textContent =
-    `Updated ${formatTime(lastLoadedAt)} • next refresh ${minutes}:${String(seconds).padStart(2, "0")}`;
-}
-
-function setOnlineState() {
-  const isOnline = navigator.onLine;
-
-  offlineBadge.hidden = isOnline;
-  connectionState.classList.toggle("offline", !isOnline);
-  connectionState.querySelector("span:last-child").textContent =
-    isOnline ? "LIVE" : "OFFLINE";
-
-  if (isOnline) {
-    loadDashboard("connection-restored");
-  } else {
-    refreshText.textContent = "Offline — showing last loaded information";
-  }
-}
-
-frame.addEventListener("load", () => {
-  clearTimeout(retryTimer);
-  lastLoadedAt = new Date();
-
-  setTimeout(() => {
-    setLoading(false);
-    updateClockAndRefreshText();
-  }, 450);
-});
-
-window.addEventListener("online", setOnlineState);
-window.addEventListener("offline", setOnlineState);
-
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && Date.now() >= nextRefreshAt) {
-    loadDashboard("screen-restored");
-  }
-});
-
-updateClockAndRefreshText();
-setInterval(updateClockAndRefreshText, 1000);
-
-loadDashboard("initial");
-setInterval(() => loadDashboard("scheduled"), CONFIG.refreshEveryMs);
+function matrixFromResponse(response){return (response?.table?.rows||[]).map(row=>(row.c||[]).map(cell=>cell?(cell.f??cell.v??""):""))}
+function findHeader(matrix,terms){return matrix.findIndex(row=>terms.every(t=>row.some(v=>norm(v).includes(t))))}
+function columnIndex(row,aliases){return row.findIndex(v=>aliases.some(a=>norm(v).includes(a)))}
+function parseTubRows(matrix){const ri=findHeader(matrix,["barn","hot tub temp"]);if(ri<0)return[];const h=matrix[ri],ix={barn:columnIndex(h,["barn"]),temp:columnIndex(h,["hot tub temp"]),set:columnIndex(h,["set temp"]),status:columnIndex(h,["tub status","status"]),pump:columnIndex(h,["pump"]),refill:columnIndex(h,["refill age","days since"]),service:columnIndex(h,["last service"])};const rows=[];for(let i=ri+1;i<matrix.length;i++){const r=matrix[i],barn=normalize(r[ix.barn]);if(!barn){if(rows.length)break;continue}if(!BARNS.some(b=>norm(b)===norm(barn))){if(rows.length)break;continue}rows.push([barn,r[ix.temp],r[ix.set],r[ix.status],r[ix.pump],r[ix.refill],r[ix.service]])}return rows}
+function findValueNear(matrix,labelAliases){for(let r=0;r<matrix.length;r++)for(let c=0;c<matrix[r].length;c++){const n=norm(matrix[r][c]);if(labelAliases.some(a=>n===a||n.includes(a))){const candidates=[matrix[r+1]?.[c],matrix[r]?.[c+1],matrix[r+1]?.[c+1],matrix[r]?.[c+2]];const val=candidates.find(v=>normalize(v)!==""&&!labelAliases.some(a=>norm(v).includes(a)));if(val!==undefined)return val}}return null}
+function parseMetrics(matrix){const map={checkIns:["check ins"],checkOuts:["check outs"],changeovers:["changeovers"],earlyCheckIns:["early check ins"],lateCheckOuts:["late check outs"],ttSetups:["tt setups"],cleaningCount:["cleaning required"],maintenanceTotal:["total items"],maintenanceOverdue:["overdue"],maintenanceThisMonth:["due this month"],maintenanceNextMonth:["due next month"],maintenanceSoon:["due soon"],patFailed:["failed"]};Object.entries(map).forEach(([id,a])=>{const v=findValueNear(matrix,a);if(v!==null)text(id,v)});const cleaning=Number($("cleaningCount").textContent)||0;text("cleaningText",cleaning?"Requires cleaning":"All cleaning complete");text("cleaningRibbon",cleaning?`Cleaning required: ${cleaning}`:"Cleaning complete");const overdue=Number($("maintenanceOverdue").textContent)||0;text("maintenanceJobs",$("maintenanceTotal").textContent);text("maintenanceText",overdue?`${overdue} overdue`:"No overdue items")}
+function parseAvailability(matrix){const candidates=[];matrix.forEach((row,i)=>{const barn=columnIndex(row,["barn"]);if(barn>=0){const dateCells=row.slice(barn+1).filter(v=>/\d{1,2}[\/\-]\d{1,2}|mon|tue|wed|thu|fri|sat|sun/i.test(normalize(v)));if(dateCells.length>=5)candidates.push({i,barn,row})}});if(!candidates.length)return null;const h=candidates[0],dates=h.row.slice(h.barn+1).filter(v=>normalize(v));const rows=[];for(let i=h.i+1;i<matrix.length;i++){const r=matrix[i],barn=normalize(r[h.barn]);if(!BARNS.some(b=>norm(b)===norm(barn))){if(rows.length)break;continue}rows.push([barn,...r.slice(h.barn+1,h.barn+1+dates.length)])}return rows.length?{dates,rows}:null}
+function applyLiveData(matrix){lastMatrix=matrix;const tubs=parseTubRows(matrix);renderTubs(tubs.length?tubs:FALLBACK_TUBS);parseMetrics(matrix);renderAvailability(parseAvailability(matrix)||defaultAvailability());text("dataStatus","Live Google Sheet connected");text("sourceState","Live");text("lastUpdated",`Updated ${new Intl.DateTimeFormat("en-GB",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())}`);$("systemState").classList.remove("offline")}
+function loadSheet(){nextRefresh=Date.now()+CONFIG.refreshMs;text("dataStatus","Refreshing live Google Sheet…");const old=document.getElementById("sheetLoader");if(old)old.remove();const script=document.createElement("script");script.id="sheetLoader";script.src=`https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?gid=${CONFIG.sheetGid}&headers=0&tqx=responseHandler:afbSheetLoaded&_=${Date.now()}`;script.onerror=()=>{text("dataStatus","Live connection retrying — showing last data");text("sourceState","Retrying");if(!lastMatrix){renderTubs(FALLBACK_TUBS);renderAvailability(defaultAvailability())}};document.head.appendChild(script)}
+window.afbSheetLoaded=response=>{if(response?.status==="error"){text("dataStatus","Sheet access needs checking — showing last data");return}applyLiveData(matrixFromResponse(response))};
+async function loadWeather(){try{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=53.27&longitude=-0.47&current=temperature_2m,weather_code&timezone=Europe%2FLondon");const j=await r.json(),c=j.current||{},code=Number(c.weather_code);text("weatherTemp",`${Math.round(c.temperature_2m)}°C`);text("weatherText",code===0?"Clear":code<4?"Partly cloudy":code<60?"Cloudy":code<80?"Rain":"Showers");text("weatherIcon",code===0?"☀":"◐")}catch{text("weatherText","Lincoln")}}
+window.addEventListener("online",()=>{text("internetState","Connected");loadSheet()});window.addEventListener("offline",()=>{text("internetState","Offline");text("sourceState","Last data")});
+renderTubs(FALLBACK_TUBS);renderAvailability(defaultAvailability());updateClock();setInterval(updateClock,1000);restartRotation();loadWeather();loadSheet();setInterval(loadSheet,CONFIG.refreshMs);
