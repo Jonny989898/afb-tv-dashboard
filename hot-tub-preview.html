@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#03090e">
+  <title>AFB Hot-tub TV Preview</title>
+  <link rel="icon" href="afb-logo.png" type="image/png">
+  <link rel="stylesheet" href="hot-tub-preview.css">
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand"><img src="afb-logo.png" alt="Ashlin Farm Barns"><div><span>AFB Staff app preview</span><h1>Hot-tub operations</h1><p>Live work status across every barn</p></div></div>
+      <div class="header-right"><div class="live"><i></i><strong>APP LINK LIVE</strong><small>Preview data</small></div><div class="clock"><strong id="clock">--:--</strong><small id="date">Loading…</small></div></div>
+    </header>
+
+    <section class="summary">
+      <article><span>Ready</span><strong id="readyCount">–</strong><small>no action required</small></article>
+      <article class="empty"><span>Empty</span><strong id="emptyCount">–</strong><small>temperature reduced</small></article>
+      <article class="work"><span>Drain / refill</span><strong id="workCount">–</strong><small>work in progress</small></article>
+      <article class="danger"><span>Lockout</span><strong id="lockoutCount">–</strong><small>do not use</small></article>
+      <article class="maintenance"><span>Maintenance</span><strong id="maintenanceCount">–</strong><small>checks paused</small></article>
+    </section>
+
+    <main>
+      <div class="board-head">
+        <div><span id="groupEyebrow">Large sand-filter tubs</span><h2 id="groupTitle">Large tubs</h2></div>
+        <div class="tabs"><button class="active" data-group="large">Large tubs <b>16</b></button><button data-group="small">Small tubs <b>8</b></button></div>
+        <div class="switch"><small>Next view</small><strong id="countdown">12s</strong></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Barn</th><th>Booking</th><th>Current</th><th>Set</th><th>App status</th><th>What staff need to do</th><th>Updated</th></tr></thead>
+          <tbody id="tubRows"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>
+      <div class="legend"><span class="ready">Ready</span><span class="empty">Empty</span><span class="drain">Draining</span><span class="refill">Refilling</span><span class="lockout">Lockout</span><span class="maintenance">Maintenance</span></div>
+      <p>Status priority: Lockout → Maintenance → Drain → Refill → Empty → Ready</p>
+      <em>Preview only — the live TV has not been changed</em>
+    </footer>
+  </div>
+  <script src="hot-tub-preview.js"></script>
+</body>
+</html>
