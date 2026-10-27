@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#112e32">
+  <meta name="referrer" content="no-referrer">
+  <title>AFB · Bed preparation</title>
+  <link rel="icon" href="afb-logo.png" type="image/png">
+  <link rel="stylesheet" href="beds.css">
+</head>
+<body>
+  <main class="bed-screen">
+    <header class="bed-header">
+      <div><p class="eyebrow">Ashlin Farm Barns · Housekeeping</p><h1>Beds for the next booking</h1></div>
+      <div class="clock"><strong id="clock">--:--</strong><span id="date"></span></div>
+    </header>
+    <div class="bed-toolbar"><p id="connection" role="status">Connecting to AFB Staff…</p><span id="pageLabel"></span></div>
+    <section id="setup" class="message" hidden aria-labelledby="setupHeading">
+      <h2 id="setupHeading">Connect this TV</h2>
+      <p>Use this TV’s AFB setup link to connect the bed screen.</p>
+      <form id="pairForm"><label for="setupLink">TV setup link</label><input id="setupLink" type="password" autocomplete="off" spellcheck="false" required placeholder="Paste your AFB TV setup link"><button type="submit">Connect TV</button></form>
+      <p id="pairError" role="alert"></p>
+    </section>
+    <section id="warning" class="message" hidden aria-live="polite"><h2 id="warningHeading">Booking information unavailable</h2><p id="warningText">Checking the AFB Staff connection. Bed quantities will appear when the booking information is verified.</p></section>
+    <section id="board" hidden aria-label="Next booking bed requirements">
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">Property / arrival</th><th scope="col">Prepare by</th><th scope="col">Bedroom 1</th><th scope="col">Bedroom 2</th><th scope="col">Bedroom 3</th><th scope="col">Bedroom 4</th><th scope="col">Bedroom 5</th><th scope="col">Bedding sets</th></tr></thead>
+        <tbody id="bedRows"></tbody>
+      </table></div>
+      <div class="bed-summary" aria-label="Bedding requirements for this page">
+        <div><span>Bedding for this page</span><small id="totalsNote">Confirmed setups only</small></div>
+        <div><strong id="superkingTotal">0</strong><span>Superking sets</span></div>
+        <div><strong id="singleTotal">0</strong><span>Single sets</span></div>
+        <div class="check-summary"><strong id="checkTotal">0</strong><span>Setups to check</span></div>
+      </div>
+    </section>
+    <footer class="bed-footer">
+      <span id="syncTime">Waiting for booking information</span>
+      <div class="page-controls"><button id="previous" type="button" aria-label="Previous properties">← Previous</button><button id="pause" type="button" aria-pressed="false">Pause pages</button><button id="next" type="button" aria-label="Next properties">Next →</button><button id="fullscreen" type="button">Full screen</button></div>
+      <span class="legend">Twin beds = 2 single sets · CHECK = confirm in AFB Staff</span>
+    </footer>
+  </main>
+  <script src="beds.js"></script>
+</body>
+</html>
